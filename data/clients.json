@@ -1,0 +1,16 @@
+{
+  "clients": [
+    {
+      "id": "jacoubus",
+      "client_name": "Jacoubus",
+      "status": "waiting",
+      "status_history": [
+        {
+          "status": "waiting",
+          "ts": "2026-09-16T17:57:44.942929Z"
+        }
+      ],
+      "updated_at": "2026-09-16T17:57:44.943196Z"
+    }
+  ]
+}
