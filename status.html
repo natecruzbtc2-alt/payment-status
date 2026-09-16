@@ -5,162 +5,232 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Payment Status</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
   :root{
-    --paper: #F6F2E7;
-    --paper-edge: #EFE9D8;
-    --ink: #211F17;
-    --ink-soft: #736E5A;
-    --ink-faint: #A39C82;
-    --rule: #D8D0B8;
-    --amber: #A5691B;
-    --amber-bg: #F1E3C8;
-    --green: #2F6B4F;
-    --green-bg: #DCEBDF;
-    --page-bg: #E8E2D0;
+    --bg: #FAFAF9;
+    --surface: #FFFFFF;
+    --ink: #14171A;
+    --ink-2: #5B6168;
+    --ink-3: #9BA1A8;
+    --line: #E8E9EB;
+    --line-strong: #DCDEE1;
+    --accent: #1D6FE0;
+    --accent-soft: #EAF2FE;
+    --success: #17835B;
+    --success-soft: #E6F5EE;
+    --shadow-1: 0 1px 2px rgba(20,23,26,0.04);
+    --shadow-2: 0 1px 1px rgba(20,23,26,0.03), 0 12px 28px -8px rgba(20,23,26,0.14);
+    --radius: 14px;
+    color-scheme: light;
   }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: #0B0D10;
+      --surface: #14171B;
+      --ink: #F1F2F4;
+      --ink-2: #9BA3AD;
+      --ink-3: #676F79;
+      --line: #232830;
+      --line-strong: #2C323C;
+      --accent: #5B93F5;
+      --accent-soft: rgba(91,147,245,0.14);
+      --success: #34C98B;
+      --success-soft: rgba(52,201,139,0.12);
+      --shadow-1: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-2: 0 1px 1px rgba(0,0,0,0.2), 0 20px 40px -12px rgba(0,0,0,0.55);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg: #0B0D10;
+    --surface: #14171B;
+    --ink: #F1F2F4;
+    --ink-2: #9BA3AD;
+    --ink-3: #676F79;
+    --line: #232830;
+    --line-strong: #2C323C;
+    --accent: #5B93F5;
+    --accent-soft: rgba(91,147,245,0.14);
+    --success: #34C98B;
+    --success-soft: rgba(52,201,139,0.12);
+    color-scheme: dark;
+  }
+
   *{ box-sizing: border-box; }
   html,body{ margin:0; padding:0; }
   body{
-    background: var(--page-bg);
-    background-image:
-      radial-gradient(circle at 1px 1px, rgba(33,31,23,0.05) 1px, transparent 0);
-    background-size: 18px 18px;
-    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-feature-settings: 'tnum' 1, 'cv01' 1;
     color: var(--ink);
     min-height: 100vh;
-    display:flex; align-items:center; justify-content:center;
-    padding: 48px 16px;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    position: relative;
+    overflow-x: hidden;
+  }
+  body::before{
+    content: '';
+    position: fixed;
+    top: -20%; left: 50%;
+    width: 900px; height: 700px;
+    transform: translateX(-50%);
+    background: radial-gradient(closest-side, var(--accent-soft), transparent 70%);
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 0;
   }
 
-  .receipt-wrap{ max-width: 380px; width: 100%; }
+  .card-wrap{ max-width: 400px; width: 100%; position: relative; z-index: 1; }
 
-  .zig-top, .zig-bottom{
-    height: 12px;
-    background: var(--paper);
-  }
-  .zig-top{
-    clip-path: polygon(
-      0% 100%, 4.16% 0%, 8.33% 100%, 12.5% 0%, 16.66% 100%, 20.83% 0%,
-      25% 100%, 29.16% 0%, 33.33% 100%, 37.5% 0%, 41.66% 100%, 45.83% 0%,
-      50% 100%, 54.16% 0%, 58.33% 100%, 62.5% 0%, 66.66% 100%, 70.83% 0%,
-      75% 100%, 79.16% 0%, 83.33% 100%, 87.5% 0%, 91.66% 100%, 95.83% 0%, 100% 100%
-    );
-  }
-  .zig-bottom{
-    clip-path: polygon(
-      0% 0%, 4.16% 100%, 8.33% 0%, 12.5% 100%, 16.66% 0%, 20.83% 100%,
-      25% 0%, 29.16% 100%, 33.33% 0%, 37.5% 100%, 41.66% 0%, 45.83% 100%,
-      50% 0%, 54.16% 100%, 58.33% 0%, 62.5% 100%, 66.66% 0%, 70.83% 100%,
-      75% 0%, 79.16% 100%, 83.33% 0%, 87.5% 100%, 91.66% 0%, 95.83% 100%, 100% 0%
-    );
-  }
-
-  .receipt{
-    background: var(--paper);
-    padding: 8px 30px 30px;
-    box-shadow: 0 2px 3px rgba(33,31,23,0.05), 0 18px 40px rgba(33,31,23,0.14);
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-2);
+    padding: 36px 32px 28px;
   }
 
   .eyebrow{
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.02em;
-    color: var(--ink-faint);
-    margin: 18px 0 2px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--ink-3);
+    letter-spacing: 0.01em;
+    margin: 0 0 6px;
   }
   h1{
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: 26px;
+    font-size: 27px;
+    font-weight: 550;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
     margin: 0 0 18px;
-    line-height: 1.15;
   }
 
-  .stamp{
+  .pill{
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    border: 1.5px solid var(--amber);
-    color: var(--amber);
-    background: var(--amber-bg);
-    padding: 7px 14px 7px 12px;
-    border-radius: 3px;
-    transform: rotate(-1.4deg);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    margin-bottom: 22px;
-  }
-  .stamp.done{ border-color: var(--green); color: var(--green); background: var(--green-bg); }
-  .stamp .dot{ width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink:0; }
-
-  .rule{
-    border: none;
-    border-top: 1px dashed var(--rule);
-    margin: 0 0 18px;
-  }
-
-  .timeline{ display:flex; flex-direction:column; margin-bottom: 6px; }
-  .step{ display:flex; align-items: baseline; gap: 12px; padding: 7px 0; }
-  .step .mark{
-    font-family: 'IBM Plex Mono', monospace;
+    gap: 7px;
+    background: var(--accent-soft);
+    color: var(--accent);
     font-size: 13px;
-    width: 14px; flex-shrink:0;
-    color: var(--ink-faint);
+    font-weight: 500;
+    padding: 6px 12px 6px 10px;
+    border-radius: 100px;
+    margin-bottom: 28px;
   }
-  .step.done .mark{ color: var(--green); }
-  .step.current .mark{ color: var(--amber); }
-  .step .name{
-    flex: 1;
-    font-size: 14px;
-    color: var(--ink-faint);
+  .pill.done{ background: var(--success-soft); color: var(--success); }
+  .pill .ring{
+    width: 7px; height: 7px; border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+    position: relative;
   }
-  .step.done .name, .step.current .name{ color: var(--ink); font-weight: 500; }
-  .step .when{
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-faint);
+  .pill:not(.done) .ring::after{
+    content: '';
+    position: absolute; inset: -4px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    opacity: 0.35;
+    animation: breathe 2.2s ease-in-out infinite;
+  }
+  @keyframes breathe{
+    0%, 100% { transform: scale(0.85); opacity: 0.35; }
+    50% { transform: scale(1.15); opacity: 0; }
+  }
+
+  .timeline{ display: flex; flex-direction: column; }
+  .step{
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    position: relative;
+    padding-bottom: 22px;
+  }
+  .step:last-child{ padding-bottom: 0; }
+  .step-rail{
+    display: flex; flex-direction: column; align-items: center;
     flex-shrink: 0;
   }
-
-  .footer-rule{
-    border: none;
-    border-top: 1px dashed var(--rule);
-    margin: 20px 0 12px;
+  .step-dot{
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--line-strong);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
   }
-  .ref{
+  .step-dot svg{ width: 10px; height: 10px; display: none; }
+  .step.done .step-dot{ background: var(--ink); border-color: var(--ink); }
+  .step.done .step-dot svg{ display: block; }
+  .step.done .step-dot path{ stroke: var(--surface); }
+  .step.current .step-dot{ border-color: var(--accent); border-width: 2px; }
+  .step-line{
+    width: 1.5px; flex: 1;
+    background: var(--line-strong);
+    margin-top: 2px;
+    min-height: 18px;
+  }
+  .step.done .step-line{ background: var(--ink-3); }
+  .step-body{ flex: 1; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding-top: 1px; }
+  .step-name{ font-size: 14.5px; color: var(--ink-3); font-weight: 450; }
+  .step.done .step-name,
+  .step.current .step-name{ color: var(--ink); font-weight: 500; }
+  .step-time{
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-faint);
-    display:flex;
+    font-size: 11.5px;
+    color: var(--ink-3);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .foot{
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    display: flex;
     justify-content: space-between;
+    align-items: center;
+  }
+  .foot-label{ font-size: 11.5px; color: var(--ink-3); }
+  .foot-value{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--ink-2);
   }
 
   .state-msg{
-    text-align:center; color: var(--ink-soft); font-size: 14px;
-    padding: 40px 20px;
-    font-family: 'Inter', sans-serif;
+    text-align: center;
+    color: var(--ink-2);
+    font-size: 14.5px;
+    padding: 32px 8px;
   }
 
   @media (prefers-reduced-motion: no-preference){
-    .receipt-wrap{ animation: settle 0.4s ease-out; }
+    .card-wrap{ animation: rise 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
   }
-  @keyframes settle{
-    from{ opacity: 0; transform: translateY(6px); }
+  @keyframes rise{
+    from{ opacity: 0; transform: translateY(10px); }
     to{ opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .pill:not(.done) .ring::after{ animation: none; }
+  }
+
+  @media (max-width: 400px){
+    .card{ padding: 28px 22px 22px; }
+    h1{ font-size: 23px; }
   }
 </style>
 </head>
 <body>
-<div class="receipt-wrap" id="wrap">
-  <div class="zig-top"></div>
-  <div class="receipt" id="receipt">
+<div class="card-wrap" id="wrap">
+  <div class="card" id="card">
     <div class="state-msg">Loading…</div>
   </div>
-  <div class="zig-bottom"></div>
 </div>
 
 <script>
@@ -175,39 +245,33 @@ const STATUSES = [
   { key: 'sent',       label: 'Payment sent' }
 ];
 
+const CHECK_SVG = '<svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5.2L3.8 7.5L8.5 2.5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
 function escapeHtml(s){
   const div = document.createElement('div');
   div.textContent = s;
   return div.innerHTML;
 }
-
 function getId(){
   return new URLSearchParams(window.location.search).get('id');
 }
-
 function timeFor(history, key){
   if(!Array.isArray(history)) return '';
   const entry = history.find(h => h.status === key);
   if(!entry) return '';
   return new Date(entry.ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 }
-
 function showMessage(text){
-  document.getElementById('receipt').innerHTML = `<div class="state-msg">${text}</div>`;
+  document.getElementById('card').innerHTML = `<div class="state-msg">${text}</div>`;
 }
 
 async function fetchClients(){
-  // The GitHub API reflects commits immediately, but is rate-limited for
-  // anonymous requests. The CDN has no meaningful rate limit but can lag
-  // a commit by a few minutes. Try the API first; fall back to the CDN.
   try{
     const res = await fetch(API_URL, {
       headers: { 'Accept': 'application/vnd.github.raw' },
       cache: 'no-store'
     });
-    if(res.ok){
-      return await res.json();
-    }
+    if(res.ok) return await res.json();
   }catch(e){
     console.warn('API fetch failed, falling back to CDN', e);
   }
@@ -219,7 +283,6 @@ async function fetchClients(){
 async function loadStatus(){
   const id = getId();
   if(!id){ showMessage('No client specified.'); return; }
-
   try{
     const data = await fetchClients();
     const list = Array.isArray(data.clients) ? data.clients : [];
@@ -241,26 +304,32 @@ function render(client){
   const stepsHtml = STATUSES.map((s, i) => {
     const done = i < currentIndex;
     const isCurrent = i === currentIndex;
-    const mark = done ? '✓' : (isCurrent ? '›' : '·');
     const cls = done ? 'done' : (isCurrent ? 'current' : '');
     const time = (done || isCurrent) ? timeFor(history, s.key) : '';
+    const isLast = i === STATUSES.length - 1;
     return `
       <div class="step ${cls}">
-        <span class="mark">${mark}</span>
-        <span class="name">${s.label}</span>
-        <span class="when">${time}</span>
+        <div class="step-rail">
+          <div class="step-dot">${CHECK_SVG}</div>
+          ${!isLast ? '<div class="step-line"></div>' : ''}
+        </div>
+        <div class="step-body">
+          <span class="step-name">${s.label}</span>
+          <span class="step-time">${time}</span>
+        </div>
       </div>
     `;
   }).join('');
 
-  document.getElementById('receipt').innerHTML = `
+  document.getElementById('card').innerHTML = `
     <p class="eyebrow">Payment status</p>
     <h1>${escapeHtml(client.client_name)}</h1>
-    <div class="stamp ${isFinal ? 'done' : ''}"><span class="dot"></span>${escapeHtml(currentLabel)}</div>
-    <hr class="rule">
+    <div class="pill ${isFinal ? 'done' : ''}"><span class="ring"></span>${escapeHtml(currentLabel)}</div>
     <div class="timeline">${stepsHtml}</div>
-    <hr class="footer-rule">
-    <div class="ref"><span>ref</span><span>${escapeHtml(client.id)}</span></div>
+    <div class="foot">
+      <span class="foot-label">Reference</span>
+      <span class="foot-value">${escapeHtml(client.id)}</span>
+    </div>
   `;
 }
 
