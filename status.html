@@ -2,96 +2,176 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Payment Status</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
 
   :root{
-    --bg: #EEF0F1;
-    --card: #FFFFFF;
-    --line: #E4E6E8;
-    --green: #1B9E5A;
-    --green-dim: #CDEEDC;
-    --ink: #1A1D1F;
-    --gray: #8A9096;
-    --gray-light: #C6CACD;
+    --paper: #F6F2E7;
+    --paper-edge: #EFE9D8;
+    --ink: #211F17;
+    --ink-soft: #736E5A;
+    --ink-faint: #A39C82;
+    --rule: #D8D0B8;
+    --amber: #A5691B;
+    --amber-bg: #F1E3C8;
+    --green: #2F6B4F;
+    --green-bg: #DCEBDF;
+    --page-bg: #E8E2D0;
   }
   *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; background: var(--bg); }
+  html,body{ margin:0; padding:0; }
   body{
-    font-family:'Inter', sans-serif; color: var(--ink);
-    min-height: 100vh; display:flex; align-items:center; justify-content:center;
-    padding: 32px 16px;
-  }
-  .card{
-    max-width: 400px; width:100%;
-    background: var(--card); border-radius: 20px;
-    padding: 28px 24px 24px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
-  }
-  .eyebrow{ font-size: 12px; color: var(--gray); text-align:center; margin: 0 0 4px; }
-  h1{ font-size: 20px; font-weight: 700; margin: 0 0 24px; text-align:center; }
-
-  .timeline{ display:flex; flex-direction:column; }
-  .step{ display:flex; align-items: flex-start; position: relative; }
-  .step:not(:last-child){ padding-bottom: 26px; }
-
-  .time{
-    width: 44px; flex-shrink:0; font-size: 12px; color: var(--gray);
-    padding-top: 3px; text-align:left;
-  }
-
-  .marker{ position: relative; width: 24px; flex-shrink:0; display:flex; justify-content:center; }
-  .dot{
-    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--page-bg);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(33,31,23,0.05) 1px, transparent 0);
+    background-size: 18px 18px;
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
     display:flex; align-items:center; justify-content:center;
-    font-size: 12px; z-index: 1; background: var(--card);
-    border: 2px solid var(--gray-light);
+    padding: 48px 16px;
   }
-  .dot.done{ background: var(--green); border-color: var(--green); color: #fff; }
-  .dot.current{ border-color: var(--green); }
-  .dot.current::after{
-    content:''; width: 9px; height:9px; border-radius:50%; background: var(--green);
-    animation: pulse 1.6s infinite;
-  }
-  @keyframes pulse{
-    0%{ box-shadow: 0 0 0 0 rgba(27,158,90,0.45); }
-    70%{ box-shadow: 0 0 0 8px rgba(27,158,90,0); }
-    100%{ box-shadow: 0 0 0 0 rgba(27,158,90,0); }
-  }
-  .step-line{
-    position:absolute; top: 24px; bottom: -2px; left: 50%;
-    width: 2px; transform: translateX(-50%);
-    background: var(--gray-light);
-  }
-  .step-line.filled{ background: var(--green); }
-  .step:last-child .step-line{ display:none; }
 
-  .label{ padding-left: 12px; padding-top: 2px; }
-  .title{ font-size: 14px; font-weight: 500; color: var(--gray); line-height: 1.4; }
-  .title.active{ color: var(--ink); font-weight: 600; }
-  .sub{ font-size: 12px; color: var(--gray); margin-top: 2px; }
+  .receipt-wrap{ max-width: 380px; width: 100%; }
 
-  .loading, .not-found{ text-align:center; color: var(--gray); font-size: 14px; padding: 30px 0; }
+  .zig-top, .zig-bottom{
+    height: 12px;
+    background: var(--paper);
+  }
+  .zig-top{
+    clip-path: polygon(
+      0% 100%, 4.16% 0%, 8.33% 100%, 12.5% 0%, 16.66% 100%, 20.83% 0%,
+      25% 100%, 29.16% 0%, 33.33% 100%, 37.5% 0%, 41.66% 100%, 45.83% 0%,
+      50% 100%, 54.16% 0%, 58.33% 100%, 62.5% 0%, 66.66% 100%, 70.83% 0%,
+      75% 100%, 79.16% 0%, 83.33% 100%, 87.5% 0%, 91.66% 100%, 95.83% 0%, 100% 100%
+    );
+  }
+  .zig-bottom{
+    clip-path: polygon(
+      0% 0%, 4.16% 100%, 8.33% 0%, 12.5% 100%, 16.66% 0%, 20.83% 100%,
+      25% 0%, 29.16% 100%, 33.33% 0%, 37.5% 100%, 41.66% 0%, 45.83% 100%,
+      50% 0%, 54.16% 100%, 58.33% 0%, 62.5% 100%, 66.66% 0%, 70.83% 100%,
+      75% 0%, 79.16% 100%, 83.33% 0%, 87.5% 100%, 91.66% 0%, 95.83% 100%, 100% 0%
+    );
+  }
 
-  footer{ margin-top: 22px; font-size: 11px; color: var(--gray-light); text-align:center; }
+  .receipt{
+    background: var(--paper);
+    padding: 8px 30px 30px;
+    box-shadow: 0 2px 3px rgba(33,31,23,0.05), 0 18px 40px rgba(33,31,23,0.14);
+  }
+
+  .eyebrow{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--ink-faint);
+    margin: 18px 0 2px;
+  }
+  h1{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 26px;
+    margin: 0 0 18px;
+    line-height: 1.15;
+  }
+
+  .stamp{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1.5px solid var(--amber);
+    color: var(--amber);
+    background: var(--amber-bg);
+    padding: 7px 14px 7px 12px;
+    border-radius: 3px;
+    transform: rotate(-1.4deg);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    margin-bottom: 22px;
+  }
+  .stamp.done{ border-color: var(--green); color: var(--green); background: var(--green-bg); }
+  .stamp .dot{ width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink:0; }
+
+  .rule{
+    border: none;
+    border-top: 1px dashed var(--rule);
+    margin: 0 0 18px;
+  }
+
+  .timeline{ display:flex; flex-direction:column; margin-bottom: 6px; }
+  .step{ display:flex; align-items: baseline; gap: 12px; padding: 7px 0; }
+  .step .mark{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    width: 14px; flex-shrink:0;
+    color: var(--ink-faint);
+  }
+  .step.done .mark{ color: var(--green); }
+  .step.current .mark{ color: var(--amber); }
+  .step .name{
+    flex: 1;
+    font-size: 14px;
+    color: var(--ink-faint);
+  }
+  .step.done .name, .step.current .name{ color: var(--ink); font-weight: 500; }
+  .step .when{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    flex-shrink: 0;
+  }
+
+  .footer-rule{
+    border: none;
+    border-top: 1px dashed var(--rule);
+    margin: 20px 0 12px;
+  }
+  .ref{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    display:flex;
+    justify-content: space-between;
+  }
+
+  .state-msg{
+    text-align:center; color: var(--ink-soft); font-size: 14px;
+    padding: 40px 20px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  @media (prefers-reduced-motion: no-preference){
+    .receipt-wrap{ animation: settle 0.4s ease-out; }
+  }
+  @keyframes settle{
+    from{ opacity: 0; transform: translateY(6px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
 </style>
 </head>
 <body>
-<div class="card" id="card">
-  <div class="loading">Loading…</div>
+<div class="receipt-wrap" id="wrap">
+  <div class="zig-top"></div>
+  <div class="receipt" id="receipt">
+    <div class="state-msg">Loading…</div>
+  </div>
+  <div class="zig-bottom"></div>
 </div>
 
 <script>
-const PANTRY_ID = 'beec09ca-c2b4-4f49-8be7-d80ec8ee202c';
-const BASKET_URL = `https://getpantry.cloud/apiv1/pantry/${PANTRY_ID}/basket/clients`;
+const DATA_URL = 'https://raw.githubusercontent.com/natecruzbtc2-alt/payment-status/main/data/clients.json';
 
 const STATUSES = [
-  { key: 'waiting', label: 'Awaiting payment', sub: "We haven't received your payment yet" },
-  { key: 'received', label: 'Payment received', sub: 'Your payment has come through' },
-  { key: 'processing', label: 'Payment processing', sub: "We're processing it now" },
-  { key: 'approved', label: 'Payment approved', sub: 'Your payment has been approved' },
-  { key: 'sent', label: 'Payment sent', sub: "It's on its way to you" }
+  { key: 'waiting',    label: 'Awaiting payment' },
+  { key: 'received',   label: 'Payment received' },
+  { key: 'processing', label: 'Payment processing' },
+  { key: 'approved',   label: 'Payment approved' },
+  { key: 'sent',       label: 'Payment sent' }
 ];
 
 function escapeHtml(s){
@@ -101,77 +181,68 @@ function escapeHtml(s){
 }
 
 function getId(){
-  const params = new URLSearchParams(window.location.search);
-  return params.get('id');
+  return new URLSearchParams(window.location.search).get('id');
 }
 
 function timeFor(history, key){
   if(!Array.isArray(history)) return '';
   const entry = history.find(h => h.status === key);
   if(!entry) return '';
-  const d = new Date(entry.ts);
-  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  return new Date(entry.ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+function showMessage(text){
+  document.getElementById('receipt').innerHTML = `<div class="state-msg">${text}</div>`;
 }
 
 async function loadStatus(){
   const id = getId();
-  const card = document.getElementById('card');
-  if(!id){
-    card.innerHTML = '<div class="not-found">No client specified.</div>';
-    return;
-  }
+  if(!id){ showMessage('No client specified.'); return; }
+
   try{
-    const res = await fetch(BASKET_URL);
-    if(res.status === 400){
-      card.innerHTML = '<div class="not-found">We couldn\'t find that payment status.</div>';
-      return;
-    }
+    // Cache-bust so viewers always see the latest committed status
+    const res = await fetch(`${DATA_URL}?t=${Date.now()}`, { cache: 'no-store' });
+    if(!res.ok){ showMessage('Nothing here yet. Check back shortly.'); return; }
     const data = await res.json();
-    const list = Array.isArray(data.list) ? data.list : [];
+    const list = Array.isArray(data.clients) ? data.clients : [];
     const client = list.find(c => c.id === id);
-    if(!client){
-      card.innerHTML = '<div class="not-found">We couldn\'t find that payment status.</div>';
-      return;
-    }
+    if(!client){ showMessage("We couldn't find that payment status."); return; }
     render(client);
   }catch(e){
     console.error('Load failed', e);
-    card.innerHTML = '<div class="not-found">Something went wrong loading this page.</div>';
+    showMessage('Something went wrong loading this page.');
   }
 }
 
 function render(client){
-  const card = document.getElementById('card');
   const currentIndex = STATUSES.findIndex(s => s.key === client.status);
   const history = client.status_history || [];
+  const currentLabel = STATUSES[currentIndex] ? STATUSES[currentIndex].label : 'Unknown';
+  const isFinal = client.status === 'sent';
 
   const stepsHtml = STATUSES.map((s, i) => {
     const done = i < currentIndex;
     const isCurrent = i === currentIndex;
-    const dotClass = done ? 'done' : (isCurrent ? 'current' : '');
-    const dotContent = done ? '✓' : '';
-    const lineClass = i < currentIndex ? 'filled' : '';
+    const mark = done ? '✓' : (isCurrent ? '›' : '·');
+    const cls = done ? 'done' : (isCurrent ? 'current' : '');
     const time = (done || isCurrent) ? timeFor(history, s.key) : '';
     return `
-      <div class="step">
-        <div class="time">${time}</div>
-        <div class="marker">
-          <div class="dot ${dotClass}">${dotContent}</div>
-          <div class="step-line ${lineClass}"></div>
-        </div>
-        <div class="label">
-          <div class="title ${done || isCurrent ? 'active' : ''}">${s.label}</div>
-          ${isCurrent ? `<div class="sub">${s.sub}</div>` : ''}
-        </div>
+      <div class="step ${cls}">
+        <span class="mark">${mark}</span>
+        <span class="name">${s.label}</span>
+        <span class="when">${time}</span>
       </div>
     `;
   }).join('');
 
-  card.innerHTML = `
+  document.getElementById('receipt').innerHTML = `
     <p class="eyebrow">Payment status</p>
     <h1>${escapeHtml(client.client_name)}</h1>
+    <div class="stamp ${isFinal ? 'done' : ''}"><span class="dot"></span>${escapeHtml(currentLabel)}</div>
+    <hr class="rule">
     <div class="timeline">${stepsHtml}</div>
-    <footer>Updates automatically</footer>
+    <hr class="footer-rule">
+    <div class="ref"><span>ref</span><span>${escapeHtml(client.id)}</span></div>
   `;
 }
 
