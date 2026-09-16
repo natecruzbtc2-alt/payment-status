@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Tableau des dépôts</title>
+<title>Payment Status — Admin</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
 
   :root{
     --bg: #0F2E1D;
-    --bg-alt: #163823;
     --card: #163823;
     --line: #2A4D37;
     --gold: #D4A843;
@@ -16,475 +15,88 @@
     --cream: #F5F0E1;
     --cream-dim: #B9C4B7;
     --red: #C1443B;
+    --green: #97C459;
   }
   *{ box-sizing: border-box; }
   html,body{ margin:0; padding:0; background: var(--bg); }
-  body{
-    font-family: 'Inter', sans-serif;
-    color: var(--cream);
-    min-height: 100vh;
-    padding: 40px 24px 80px;
-  }
+  body{ font-family:'Inter', sans-serif; color: var(--cream); min-height:100vh; padding: 40px 24px 80px; }
   .wrap{ max-width: 760px; margin: 0 auto; }
 
-  header{ display:flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
-  h1{
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: 34px;
-    margin: 0 0 4px;
-    letter-spacing: -0.01em;
-  }
-  .sub{ color: var(--cream-dim); font-size: 14px; margin:0; }
+  h1{ font-family:'Fraunces', serif; font-weight:600; font-size: 32px; margin: 0 0 4px; }
+  .sub{ color: var(--cream-dim); font-size: 14px; margin: 0 0 28px; }
 
-  .month-total{ text-align: right; }
-  .month-total .label{ font-size: 12px; color: var(--cream-dim); margin-bottom: 4px; }
-  .month-total .num{ font-family: 'IBM Plex Mono', monospace; font-size: 28px; font-weight: 600; color: var(--gold-bright); }
-
-  .panel{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 20px 22px;
-    margin-bottom: 20px;
-  }
-  .panel h2{
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: 17px;
-    margin: 0 0 16px;
-  }
+  .panel{ background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px 22px; margin-bottom: 20px; }
+  .panel h2{ font-family:'Fraunces', serif; font-weight:600; font-size: 17px; margin: 0 0 16px; }
 
   form{ display:flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
-  .field{ display:flex; flex-direction:column; gap:6px; flex: 1; min-width: 140px; }
+  .field{ display:flex; flex-direction:column; gap:6px; flex:1; min-width: 160px; }
   .field label{ font-size: 12px; color: var(--cream-dim); }
-  input, select{
-    background: var(--bg);
-    border: 1px solid var(--line);
-    color: var(--cream);
-    padding: 10px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-family: 'Inter', sans-serif;
-    outline: none;
-  }
-  input:focus, select:focus{ border-color: var(--gold); }
-  input[type=number]{ font-family: 'IBM Plex Mono', monospace; }
-
-  button{
-    background: var(--gold);
-    color: #1A2E1E;
-    border: none;
-    padding: 11px 20px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-  }
+  input{ background: var(--bg); border: 1px solid var(--line); color: var(--cream); padding: 10px 12px; border-radius: 6px; font-size: 14px; font-family: 'Inter', sans-serif; outline:none; }
+  input:focus{ border-color: var(--gold); }
+  button{ background: var(--gold); color:#1A2E1E; border:none; padding: 11px 20px; border-radius:6px; font-weight:600; font-size:14px; cursor:pointer; font-family:'Inter', sans-serif; }
   button:hover{ background: var(--gold-bright); }
-  button:active{ transform: scale(0.98); }
 
-  .error{ color: var(--red); font-size: 13px; margin-top: 8px; display:none; }
+  .clients{ display:flex; flex-direction:column; gap: 12px; }
+  .client{ background: var(--card); border:1px solid var(--line); border-radius:10px; padding: 16px 18px; }
+  .client-top{ display:flex; justify-content:space-between; align-items:center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .client-name{ font-size: 16px; font-weight: 600; }
+  .client-actions{ display:flex; gap: 10px; align-items:center; }
+  .client-actions button{ background: transparent; border:none; padding: 2px 4px; color: var(--cream-dim); font-size:12px; text-decoration:underline; cursor:pointer; }
+  .client-actions button:hover{ color: var(--gold-bright); }
+  .client-actions .delete-client:hover{ color: var(--red); }
 
-  .board{ display:flex; flex-direction:column; gap: 10px; }
-  .row{
-    display:flex; align-items:center; gap:14px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 14px 16px;
+  .status-picker{ display:flex; gap:8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .status-btn{
+    background: var(--bg); border: 1px solid var(--line); color: var(--cream-dim);
+    padding: 7px 14px; border-radius: 20px; font-size: 12px; cursor:pointer;
+    font-family:'Inter', sans-serif;
   }
-  .rank{
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    color: var(--cream-dim);
-    width: 20px;
-  }
-  .row .info{ flex: 1; min-width: 0; }
-  .row .name{ font-size: 15px; font-weight: 600; margin-bottom: 6px; }
-  .row .barwrap{ background: var(--bg); border-radius: 4px; height: 6px; overflow:hidden; }
-  .row .bar{ height:100%; background: var(--gold); border-radius: 4px; }
-  .row .bar.over{ background: #97C459; }
-  .row .target-line{ display:flex; align-items:center; gap:6px; margin-top:6px; font-size: 12px; color: var(--cream-dim); }
-  .row .target-line button{
-    background: transparent; border: none; padding: 0; color: var(--cream-dim);
-    font-size: 12px; text-decoration: underline; cursor: pointer;
-  }
-  .row .target-line button:hover{ color: var(--gold-bright); }
-  .row .target-edit{ display:flex; align-items:center; gap:6px; margin-top:6px; }
-  .row .target-edit input{ width: 100px; padding: 4px 8px; font-size: 12px; }
-  .row .target-edit button{
-    background: var(--gold); color:#1A2E1E; border:none; padding: 4px 10px;
-    border-radius: 5px; font-size: 12px; font-weight:600; cursor:pointer;
-  }
-  .row .amt{
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--gold-bright);
-    white-space: nowrap;
-  }
+  .status-btn:hover{ border-color: var(--gold); }
+  .status-btn.active{ background: var(--gold); color:#1A2E1E; border-color: var(--gold); font-weight:600; }
 
-  .empty{ color: var(--cream-dim); font-size: 14px; padding: 20px 0; text-align:center; }
+  .link-row{ display:flex; align-items:center; gap:8px; font-size: 12px; color: var(--cream-dim); }
+  .link-row code{ background: var(--bg); padding: 5px 10px; border-radius:5px; font-family:'IBM Plex Mono', monospace; font-size: 11px; flex:1; overflow-x:auto; white-space: nowrap; }
+  .link-row button{ padding: 6px 12px; font-size: 12px; }
 
-  .ticker{ font-size: 13px; color: var(--cream-dim); }
-  .ticker .entry{ padding: 6px 0; border-bottom: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; }
-  .ticker .entry:last-child{ border-bottom:none; }
-  .ticker .entry .who{ color: var(--cream); }
-  .ticker .entry .amt{ font-family:'IBM Plex Mono', monospace; color: var(--gold-bright); }
-  .ticker .entry-actions{ display:flex; align-items:center; gap:8px; }
-  .ticker .entry-actions button{
-    background: transparent; border:none; padding: 2px 4px; color: var(--cream-dim);
-    cursor:pointer; font-size: 12px; text-decoration: underline;
-  }
-  .ticker .entry-actions button:hover{ color: var(--gold-bright); }
-  .ticker .entry-actions .delete-deposit:hover{ color: var(--red); }
-  .ticker .entry-edit{ display:flex; align-items:center; gap:6px; }
-  .ticker .entry-edit input{ width: 90px; padding: 4px 8px; font-size: 12px; }
-  .ticker .entry-edit button{
-    background: var(--gold); color:#1A2E1E; border:none; padding: 4px 10px;
-    border-radius: 5px; font-size: 12px; font-weight:600; cursor:pointer;
-  }
-  .ticker .entry-edit .cancel-deposit{ background: transparent; color: var(--cream-dim); text-decoration: underline; }
-
-  .overlay{
-    position: fixed; inset:0; background: rgba(10,22,15,0.92);
-    display:flex; align-items:center; justify-content:center;
-    z-index: 999; opacity:0; pointer-events:none; transition: opacity 0.25s;
-  }
-  .overlay.show{ opacity:1; pointer-events:auto; }
-  .celebrate-card{
-    text-align:center; max-width: 480px; padding: 20px;
-  }
-  .celebrate-card .big{
-    font-family:'Fraunces', serif; font-weight:600;
-    font-size: 40px; color: var(--gold-bright); margin: 0 0 8px;
-  }
-  .celebrate-card .amt{
-    font-family:'IBM Plex Mono', monospace; font-size: 52px; font-weight:600;
-    color: var(--cream); margin: 0 0 14px;
-  }
-  .celebrate-card .msg{ font-size:15px; color: var(--cream-dim); margin: 0 0 22px; }
-  .celebrate-card button{ padding: 12px 28px; }
-
-  canvas#confetti{ position:fixed; inset:0; z-index: 1000; pointer-events:none; }
-
-  .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 20px; }
-  .tab{
-    background: var(--card); border: 1px solid var(--line); color: var(--cream-dim);
-    padding: 8px 14px; border-radius: 20px; font-size: 13px; cursor: pointer;
-    font-family: 'Inter', sans-serif;
-  }
-  .tab:hover{ border-color: var(--gold); }
-  .tab.active{ background: var(--gold); color: #1A2E1E; border-color: var(--gold); font-weight: 600; }
-
-  footer{ margin-top: 30px; font-size: 12px; color: var(--cream-dim); text-align:center; }
+  .empty{ color: var(--cream-dim); font-size: 14px; padding: 30px 0; text-align:center; }
+  .copied{ color: var(--green); font-size: 12px; margin-left: 6px; }
 </style>
 </head>
 <body>
 <div class="wrap">
-
-  <header>
-    <div>
-      <h1>Tableau des dépôts — admin</h1>
-      <p class="sub">Enregistrez, modifiez et gérez les dépôts des agents.</p>
-    </div>
-    <div class="month-total">
-      <div class="label" id="grandTotalLabel">Total du tableau</div>
-      <div class="num" id="grandTotal">$0</div>
-    </div>
-  </header>
-
-  <div class="tabs" id="monthTabs"></div>
+  <h1>Payment status — admin</h1>
+  <p class="sub">Add clients, update their status, and share their personal link.</p>
 
   <div class="panel">
-    <h2>Enregistrer un dépôt</h2>
-    <form id="depositForm">
+    <h2>Add a client</h2>
+    <form id="addForm">
       <div class="field">
-        <label for="agentInput">Agent</label>
-        <input list="agentList" id="agentInput" placeholder="Tapez un nom" autocomplete="off">
-        <datalist id="agentList"></datalist>
+        <label for="nameInput">Client name</label>
+        <input id="nameInput" placeholder="Type a name" autocomplete="off">
       </div>
-      <div class="field" style="max-width:160px;">
-        <label for="amountInput">Montant ($)</label>
-        <input type="number" id="amountInput" placeholder="0" min="0" step="1">
-      </div>
-      <button type="submit">Enregistrer le dépôt</button>
+      <button type="submit">Add client</button>
     </form>
-    <div class="error" id="formError"></div>
   </div>
 
   <div class="panel">
-    <h2>Classement</h2>
-    <div class="board" id="board"></div>
-  </div>
-
-  <div class="panel">
-    <h2>Activité récente</h2>
-    <div class="ticker" id="ticker"></div>
-  </div>
-
-  <footer>Synchronisé entre appareils via Supabase. Ceci est la page d'administration — gardez ce lien privé ; le tableau public est une page séparée.</footer>
-</div>
-
-<div class="overlay" id="overlay">
-  <div class="celebrate-card">
-    <p class="big" id="celebrateTitle">Félicitations !</p>
-    <p class="amt" id="celebrateAmt">$0</p>
-    <p class="msg" id="celebrateMsg"></p>
-    <button id="celebrateClose">Continuer</button>
+    <h2>Clients</h2>
+    <div class="clients" id="clients"></div>
   </div>
 </div>
-<canvas id="confetti"></canvas>
 
 <script>
-const SUPABASE_URL = 'https://spcxjfamozmnkgowztij.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNwY3hqZmFtb3ptbmtnb3d6dGlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNjU2OTgsImV4cCI6MjEwMzc0MTY5OH0._hKnAK5gLwwLArYLShxTL3Abpv4ZN2LGqz5PKti-Apc';
-const ROW_ID = 'main-fr';
-const DEFAULT_TARGET = 100000;
-let agents = [];
-let selectedMonth = 'all';
-let editingTarget = null;
-let editingDeposit = null;
-let saveIndicatorTimer = null;
+const PANTRY_ID = 'beec09ca-c2b4-4f49-8be7-d80ec8ee202c';
+const BASKET_URL = `https://getpantry.cloud/apiv1/pantry/${PANTRY_ID}/basket/clients`;
 
-function fmt(n){
-  return '$' + Math.round(n).toLocaleString('en-US');
-}
+const STATUSES = [
+  { key: 'waiting', label: 'Awaiting payment' },
+  { key: 'received', label: 'Payment received' },
+  { key: 'processing', label: 'Payment processing' },
+  { key: 'approved', label: 'Payment approved' },
+  { key: 'sent', label: 'Payment sent' }
+];
 
-function monthKey(ts){
-  const d = new Date(ts);
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-}
-
-function monthLabel(key){
-  const [y, m] = key.split('-').map(Number);
-  const d = new Date(y, m-1, 1);
-  return d.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
-}
-
-async function loadData(isInitial){
-  try{
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/deposit_board?id=eq.${ROW_ID}&select=data`,
-      {
-        headers: {
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-        }
-      }
-    );
-    const rows = await res.json();
-    agents = (rows && rows.length) ? rows[0].data : [];
-  }catch(e){
-    console.error('Load failed', e);
-    agents = [];
-  }
-  if(isInitial) selectedMonth = monthKey(Date.now());
-  render();
-}
-
-async function saveData(){
-  try{
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/deposit_board?on_conflict=id`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates'
-      },
-      body: JSON.stringify({ id: ROW_ID, data: agents, updated_at: new Date().toISOString() })
-    });
-    if(!res.ok){
-      const errText = await res.text();
-      console.error('Save failed:', res.status, errText);
-    }
-  }catch(e){
-    console.error('Save failed', e);
-  }
-}
-
-function allDepositsFlat(){
-  const list = [];
-  agents.forEach(a => a.deposits.forEach(d => list.push({name:a.name, ...d, id: d.id || String(d.ts)})));
-  return list;
-}
-
-function renderTabs(){
-  const flat = allDepositsFlat();
-  const keys = Array.from(new Set(flat.map(d => monthKey(d.ts))));
-  const currentKey = monthKey(Date.now());
-  if(!keys.includes(currentKey)) keys.push(currentKey);
-  keys.sort().reverse();
-
-  const tabsEl = document.getElementById('monthTabs');
-  const buttons = keys.map(k => `<button type="button" class="tab ${k===selectedMonth?'active':''}" data-month="${k}">${monthLabel(k)}</button>`);
-  buttons.push(`<button type="button" class="tab ${selectedMonth==='all'?'active':''}" data-month="all">Depuis toujours</button>`);
-  tabsEl.innerHTML = buttons.join('');
-  tabsEl.querySelectorAll('.tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      selectedMonth = btn.dataset.month;
-      render();
-    });
-  });
-}
-
-function render(){
-  renderTabs();
-
-  const flat = allDepositsFlat().filter(d => selectedMonth === 'all' || monthKey(d.ts) === selectedMonth);
-
-  const totalsByAgent = {};
-  flat.forEach(d => {
-    totalsByAgent[d.name] = (totalsByAgent[d.name] || 0) + d.amount;
-  });
-  const sorted = Object.entries(totalsByAgent)
-    .map(([name, total]) => {
-      const agent = agents.find(a => a.name === name);
-      return { name, total, target: (agent && agent.target) || DEFAULT_TARGET };
-    })
-    .sort((a,b)=> b.total - a.total);
-
-  const grand = flat.reduce((s,d)=> s + d.amount, 0);
-  document.getElementById('grandTotal').textContent = fmt(grand);
-  document.getElementById('grandTotalLabel').textContent =
-    selectedMonth === 'all' ? 'Total du tableau' : monthLabel(selectedMonth) + ' — total';
-
-  const board = document.getElementById('board');
-  if(!sorted.length){
-    board.innerHTML = '<div class="empty">Aucun dépôt enregistré pour cette période.</div>';
-  } else {
-    board.innerHTML = sorted.map((a, i) => {
-      const pct = Math.min(100, (a.total / a.target) * 100);
-      const over = a.total >= a.target;
-      const isEditing = editingTarget === a.name;
-      const targetRow = isEditing
-        ? `<div class="target-edit">
-             <input type="number" min="0" step="1" id="targetInput-${i}" value="${a.target}">
-             <button type="button" class="save-target" data-name="${escapeHtml(a.name)}">Enregistrer</button>
-           </div>`
-        : `<div class="target-line">
-             <span>${fmt(a.total)} sur objectif de ${fmt(a.target)}${over ? ' — atteint' : ''}</span>
-             <button type="button" class="edit-target" data-name="${escapeHtml(a.name)}">Modifier l'objectif</button>
-           </div>`;
-      return `
-      <div class="row">
-        <div class="rank">${i+1}</div>
-        <div class="info">
-          <div class="name">${escapeHtml(a.name)}</div>
-          <div class="barwrap"><div class="bar ${over ? 'over' : ''}" style="width:${Math.max(4, pct)}%"></div></div>
-          ${targetRow}
-        </div>
-        <div class="amt">${fmt(a.total)}</div>
-      </div>
-    `;
-    }).join('');
-
-    board.querySelectorAll('.edit-target').forEach(btn => {
-      btn.addEventListener('click', () => {
-        editingTarget = btn.dataset.name;
-        render();
-      });
-    });
-    board.querySelectorAll('.save-target').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const name = btn.dataset.name;
-        const input = btn.previousElementSibling;
-        const val = parseFloat(input.value);
-        const agent = agents.find(a => a.name === name);
-        if(agent && val >= 0){
-          agent.target = val;
-          await saveData();
-        }
-        editingTarget = null;
-        render();
-      });
-    });
-  }
-
-  const datalist = document.getElementById('agentList');
-  datalist.innerHTML = agents.map(a => `<option value="${escapeHtml(a.name)}"></option>`).join('');
-
-  const tickerList = [...flat].sort((x,y)=> y.ts - x.ts);
-  const ticker = document.getElementById('ticker');
-  if(!tickerList.length){
-    ticker.innerHTML = '<div class="empty">Rien pour le moment.</div>';
-  } else {
-    ticker.innerHTML = tickerList.slice(0,15).map(d => {
-      const isEditing = editingDeposit === d.id;
-      if(isEditing){
-        return `
-        <div class="entry">
-          <span class="who">${escapeHtml(d.name)}</span>
-          <span class="entry-edit">
-            <input type="number" min="0" step="1" id="editAmt-${d.id}" value="${d.amount}">
-            <button type="button" class="save-deposit" data-id="${d.id}" data-name="${escapeHtml(d.name)}">Enregistrer</button>
-            <button type="button" class="cancel-deposit">Annuler</button>
-          </span>
-        </div>`;
-      }
-      return `
-      <div class="entry">
-        <span class="who">${escapeHtml(d.name)}</span>
-        <span class="entry-actions">
-          <span class="amt">${fmt(d.amount)}</span>
-          <button type="button" class="edit-deposit" data-id="${d.id}">Modifier</button>
-          <button type="button" class="delete-deposit" data-id="${d.id}" data-name="${escapeHtml(d.name)}">Supprimer</button>
-        </span>
-      </div>`;
-    }).join('');
-
-    ticker.querySelectorAll('.edit-deposit').forEach(btn => {
-      btn.addEventListener('click', () => {
-        editingDeposit = btn.dataset.id;
-        render();
-      });
-    });
-    ticker.querySelectorAll('.cancel-deposit').forEach(btn => {
-      btn.addEventListener('click', () => {
-        editingDeposit = null;
-        render();
-      });
-    });
-    ticker.querySelectorAll('.save-deposit').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = btn.dataset.id;
-        const name = btn.dataset.name;
-        const input = document.getElementById(`editAmt-${id}`);
-        const newAmt = parseFloat(input.value);
-        if(!newAmt || newAmt <= 0){
-          input.style.borderColor = 'var(--red)';
-          return;
-        }
-        const agent = agents.find(a => a.name === name);
-        if(agent){
-          const dep = agent.deposits.find(dd => (dd.id || String(dd.ts)) === id);
-          if(dep) dep.amount = newAmt;
-          agent.total = agent.deposits.reduce((s,dd)=> s + dd.amount, 0);
-          await saveData();
-        }
-        editingDeposit = null;
-        render();
-      });
-    });
-    ticker.querySelectorAll('.delete-deposit').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = btn.dataset.id;
-        const name = btn.dataset.name;
-        if(!confirm(`Supprimer ce dépôt de ${name} ?`)) return;
-        const agent = agents.find(a => a.name === name);
-        if(agent){
-          agent.deposits = agent.deposits.filter(dd => (dd.id || String(dd.ts)) !== id);
-          agent.total = agent.deposits.reduce((s,dd)=> s + dd.amount, 0);
-          await saveData();
-        }
-        render();
-      });
-    });
-  }
-}
+let clients = [];
 
 function escapeHtml(s){
   const div = document.createElement('div');
@@ -492,160 +104,146 @@ function escapeHtml(s){
   return div.innerHTML;
 }
 
-document.getElementById('depositForm').addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const nameInput = document.getElementById('agentInput');
-  const amountInput = document.getElementById('amountInput');
-  const errorEl = document.getElementById('formError');
-  const name = nameInput.value.trim();
-  const amount = parseFloat(amountInput.value);
-
-  if(!name){
-    errorEl.textContent = "Entrez d'abord un nom d'agent.";
-    errorEl.style.display = 'block';
-    return;
-  }
-  if(!amount || amount <= 0){
-    errorEl.textContent = 'Entrez un montant supérieur à 0.';
-    errorEl.style.display = 'block';
-    return;
-  }
-  errorEl.style.display = 'none';
-
-  let agent = agents.find(a => a.name.toLowerCase() === name.toLowerCase());
-  if(!agent){
-    agent = { name, total: 0, deposits: [], target: DEFAULT_TARGET };
-    agents.push(agent);
-  }
-  agent.total += amount;
-  agent.deposits.push({ id: `${Date.now()}-${Math.random().toString(36).slice(2,8)}`, amount, ts: Date.now() });
-
-  await saveData();
-  render();
-  celebrate(name, amount);
-
-  nameInput.value = '';
-  amountInput.value = '';
-});
-
-function celebrate(name, amount){
-  const big = amount >= 10000;
-  document.getElementById('celebrateTitle').textContent = `Beau dépôt, ${name} !`;
-  document.getElementById('celebrateAmt').textContent = fmt(amount);
-  document.getElementById('celebrateMsg').textContent = big
-    ? 'Cinq chiffres en un seul dépôt. Un vrai jalon.'
-    : 'Un dépôt de plus sur le tableau.';
-
-  const overlay = document.getElementById('overlay');
-  overlay.classList.add('show');
-  runConfetti(big);
-  playJingle(big);
+function slugify(name){
+  return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
-document.getElementById('celebrateClose').addEventListener('click', ()=>{
-  document.getElementById('overlay').classList.remove('show');
-});
-
-const canvas = document.getElementById('confetti');
-const ctx = canvas.getContext('2d');
-function resizeCanvas(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-
-let particles = [];
-let confettiAnim = null;
-
-function runConfetti(big){
-  const colors = ['#D4A843','#F0C464','#F5F0E1','#639922','#97C459'];
-  const count = big ? 220 : 100;
-  particles = [];
-  for(let i=0;i<count;i++){
-    particles.push({
-      x: Math.random()*canvas.width,
-      y: -20 - Math.random()*canvas.height*0.5,
-      w: 6 + Math.random()*6,
-      h: 8 + Math.random()*8,
-      color: colors[Math.floor(Math.random()*colors.length)],
-      vy: 2 + Math.random()*3 + (big?1.5:0),
-      vx: -1.5 + Math.random()*3,
-      rot: Math.random()*360,
-      vrot: -6 + Math.random()*12,
-      isDollar: big && Math.random() < 0.15
-    });
-  }
-  const start = performance.now();
-  const duration = big ? 4200 : 3000;
-  if(confettiAnim) cancelAnimationFrame(confettiAnim);
-  function frame(t){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    let alive = false;
-    particles.forEach(p=>{
-      p.x += p.vx; p.y += p.vy; p.rot += p.vrot;
-      if(p.y < canvas.height + 30) alive = true;
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot * Math.PI/180);
-      if(p.isDollar){
-        ctx.fillStyle = '#F0C464';
-        ctx.font = '18px IBM Plex Mono, monospace';
-        ctx.fillText('$', -5, 5);
-      } else {
-        ctx.fillStyle = p.color;
-        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-      }
-      ctx.restore();
-    });
-    if(t - start < duration && alive){
-      confettiAnim = requestAnimationFrame(frame);
-    } else {
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-    }
-  }
-  confettiAnim = requestAnimationFrame(frame);
-}
-
-let audioCtx = null;
-function playJingle(big){
+async function loadClients(){
   try{
-    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const now = audioCtx.currentTime;
-    const notes = big
-      ? [523.25, 659.25, 783.99, 1046.50, 1318.51]
-      : [523.25, 659.25, 783.99];
-    notes.forEach((freq, i)=>{
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.value = freq;
-      const t0 = now + i * 0.11;
-      gain.gain.setValueAtTime(0.0001, t0);
-      gain.gain.exponentialRampToValueAtTime(0.28, t0 + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.35);
-      osc.connect(gain).connect(audioCtx.destination);
-      osc.start(t0);
-      osc.stop(t0 + 0.4);
-    });
-    if(big){
-      const t1 = now + notes.length * 0.11 + 0.05;
-      const osc2 = audioCtx.createOscillator();
-      const gain2 = audioCtx.createGain();
-      osc2.type = 'square';
-      osc2.frequency.setValueAtTime(1046.50, t1);
-      osc2.frequency.exponentialRampToValueAtTime(1568, t1 + 0.25);
-      gain2.gain.setValueAtTime(0.0001, t1);
-      gain2.gain.exponentialRampToValueAtTime(0.22, t1 + 0.03);
-      gain2.gain.exponentialRampToValueAtTime(0.0001, t1 + 0.5);
-      osc2.connect(gain2).connect(audioCtx.destination);
-      osc2.start(t1);
-      osc2.stop(t1 + 0.55);
+    const res = await fetch(BASKET_URL);
+    if(res.status === 400){
+      // Basket doesn't exist yet — totally normal before the first save
+      clients = [];
+      render();
+      return;
     }
+    const data = await res.json();
+    if(!res.ok || !Array.isArray(data.list)){
+      console.error('Load failed:', data);
+      document.getElementById('clients').innerHTML =
+        '<div class="empty">Could not load clients. Check the browser console (F12) for details.</div>';
+      clients = [];
+      return;
+    }
+    clients = data.list;
   }catch(e){
-    console.error('Audio failed', e);
+    console.error('Load failed', e);
+    document.getElementById('clients').innerHTML =
+      '<div class="empty">Could not connect to the database. Check the browser console (F12) for details.</div>';
+    clients = [];
+    return;
+  }
+  render();
+}
+
+async function saveClients(){
+  try{
+    const res = await fetch(BASKET_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ list: clients })
+    });
+    if(!res.ok) console.error('Save failed', res.status, await res.text());
+  }catch(e){
+    console.error('Save failed', e);
   }
 }
 
-loadData(true);
-setInterval(() => loadData(false), 15000);
+
+
+function render(){
+  const container = document.getElementById('clients');
+  if(!clients.length){
+    container.innerHTML = '<div class="empty">No clients yet. Add one above.</div>';
+    return;
+  }
+
+  container.innerHTML = clients.map(c => {
+    const link = `${window.location.origin}${window.location.pathname.replace('admin.html','')}status.html?id=${c.id}`;
+    return `
+    <div class="client">
+      <div class="client-top">
+        <div class="client-name">${escapeHtml(c.client_name)}</div>
+        <div class="client-actions">
+          <button type="button" class="delete-client" data-id="${c.id}">Delete</button>
+        </div>
+      </div>
+      <div class="status-picker">
+        ${STATUSES.map(s => `
+          <button type="button" class="status-btn ${c.status===s.key?'active':''}" data-id="${c.id}" data-status="${s.key}">${s.label}</button>
+        `).join('')}
+      </div>
+      <div class="link-row">
+        <code id="link-${c.id}">${link}</code>
+        <button type="button" class="copy-link" data-id="${c.id}">Copy link</button>
+        <span class="copied" id="copied-${c.id}" style="display:none;">Copied</span>
+      </div>
+    </div>
+    `;
+  }).join('');
+
+  container.querySelectorAll('.status-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      const status = btn.dataset.status;
+      const client = clients.find(c => c.id === id);
+      if(client){
+        if(client.status !== status){
+          const history = Array.isArray(client.status_history) ? [...client.status_history] : [];
+          history.push({ status, ts: new Date().toISOString() });
+          client.status_history = history;
+        }
+        client.status = status;
+        client.updated_at = new Date().toISOString();
+        await saveClients();
+        render();
+      }
+    });
+  });
+
+  container.querySelectorAll('.delete-client').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      const client = clients.find(c => c.id === id);
+      if(!confirm(`Delete ${client ? client.client_name : 'this client'}?`)) return;
+      clients = clients.filter(c => c.id !== id);
+      render();
+      await saveClients();
+    });
+  });
+
+  container.querySelectorAll('.copy-link').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      const text = document.getElementById(`link-${id}`).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const el = document.getElementById(`copied-${id}`);
+        el.style.display = 'inline';
+        setTimeout(() => { el.style.display = 'none'; }, 1500);
+      });
+    });
+  });
+}
+
+document.getElementById('addForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if(!Array.isArray(clients)) clients = [];
+  const input = document.getElementById('nameInput');
+  const name = input.value.trim();
+  if(!name) return;
+  let id = slugify(name);
+  if(clients.find(c => c.id === id)){
+    id = id + '-' + Math.random().toString(36).slice(2,6);
+  }
+  const client = { id, client_name: name, status: 'waiting', status_history: [{ status: 'waiting', ts: new Date().toISOString() }], updated_at: new Date().toISOString() };
+  clients.unshift(client);
+  render();
+  input.value = '';
+  await saveClients();
+});
+
+loadClients();
+setInterval(loadClients, 15000);
 </script>
 </body>
 </html>
