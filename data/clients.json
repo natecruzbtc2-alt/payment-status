@@ -31,14 +31,18 @@
     {
       "id": "jacoubus",
       "client_name": "Jacoubus",
-      "status": "waiting",
+      "status": "received",
       "status_history": [
         {
           "status": "waiting",
           "ts": "2026-09-16T17:57:44.942929Z"
+        },
+        {
+          "status": "received",
+          "ts": "2026-09-16T18:07:48.216Z"
         }
       ],
-      "updated_at": "2026-09-16T17:57:44.943196Z"
+      "updated_at": "2026-09-16T18:07:48.216Z"
     }
   ]
 }
