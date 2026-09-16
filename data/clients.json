@@ -3,7 +3,7 @@
     {
       "id": "andries-bergervoet",
       "client_name": "Andries Bergervoet",
-      "status": "processing",
+      "status": "approved",
       "status_history": [
         {
           "status": "waiting",
@@ -16,9 +16,13 @@
         {
           "status": "processing",
           "ts": "2026-09-16T18:06:16.015Z"
+        },
+        {
+          "status": "approved",
+          "ts": "2026-09-16T18:06:18.413Z"
         }
       ],
-      "updated_at": "2026-09-16T18:06:16.015Z"
+      "updated_at": "2026-09-16T18:06:18.413Z"
     },
     {
       "id": "jacoubus",
