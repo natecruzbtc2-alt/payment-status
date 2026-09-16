@@ -60,12 +60,14 @@
 
   .empty{ color: var(--cream-dim); font-size: 14px; padding: 30px 0; text-align:center; }
   .copied{ color: var(--green); font-size: 12px; margin-left: 6px; }
+  .save-error{ color: var(--red); font-size: 12px; margin: -8px 0 20px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Payment status — admin</h1>
   <p class="sub">Add clients, update their status, and share their personal link.</p>
+  <div class="save-error" id="saveError" style="display:none;"></div>
 
   <div class="panel">
     <h2>Add a client</h2>
@@ -97,6 +99,7 @@ const STATUSES = [
 ];
 
 let clients = [];
+let basketExists = false; // tracks whether the Pantry basket has been created yet
 
 function escapeHtml(s){
   const div = document.createElement('div');
@@ -108,12 +111,19 @@ function slugify(name){
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
+function showSaveError(msg){
+  const el = document.getElementById('saveError');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
 async function loadClients(){
   try{
     const res = await fetch(BASKET_URL);
     if(res.status === 400){
       // Basket doesn't exist yet — totally normal before the first save
       clients = [];
+      basketExists = false;
       render();
       return;
     }
@@ -126,6 +136,7 @@ async function loadClients(){
       return;
     }
     clients = data.list;
+    basketExists = true;
   }catch(e){
     console.error('Load failed', e);
     document.getElementById('clients').innerHTML =
@@ -138,14 +149,28 @@ async function loadClients(){
 
 async function saveClients(){
   try{
+    // Pantry's basket API uses two different verbs:
+    //   POST -> create the basket (only succeeds while it doesn't exist yet)
+    //   PUT  -> update/merge into an existing basket's contents
+    // Using POST for every save meant only the very first save ever
+    // succeeded; every save after that got rejected with a 400 and was
+    // silently dropped, so changes reverted on the next 15s reload.
+    const method = basketExists ? 'PUT' : 'POST';
     const res = await fetch(BASKET_URL, {
-      method: 'POST',
+      method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ list: clients })
     });
-    if(!res.ok) console.error('Save failed', res.status, await res.text());
+    if(!res.ok){
+      console.error('Save failed', res.status, await res.text());
+      showSaveError('Could not save changes. Check the browser console (F12) for details.');
+      return;
+    }
+    basketExists = true;
+    showSaveError('');
   }catch(e){
     console.error('Save failed', e);
+    showSaveError('Could not save changes. Check the browser console (F12) for details.');
   }
 }
 
@@ -159,7 +184,8 @@ function render(){
   }
 
   container.innerHTML = clients.map(c => {
-    const link = `${window.location.origin}${window.location.pathname.replace('admin.html','')}status.html?id=${c.id}`;
+    const dir = window.location.pathname.replace(/[^/]*$/, '');
+    const link = `${window.location.origin}${dir}status.html?id=${c.id}`;
     return `
     <div class="client">
       <div class="client-top">
