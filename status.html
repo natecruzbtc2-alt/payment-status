@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Payment Status</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg: #EEF0F1;
+    --card: #FFFFFF;
+    --line: #E4E6E8;
+    --green: #1B9E5A;
+    --green-dim: #CDEEDC;
+    --ink: #1A1D1F;
+    --gray: #8A9096;
+    --gray-light: #C6CACD;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background: var(--bg); }
+  body{
+    font-family:'Inter', sans-serif; color: var(--ink);
+    min-height: 100vh; display:flex; align-items:center; justify-content:center;
+    padding: 32px 16px;
+  }
+  .card{
+    max-width: 400px; width:100%;
+    background: var(--card); border-radius: 20px;
+    padding: 28px 24px 24px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+  }
+  .eyebrow{ font-size: 12px; color: var(--gray); text-align:center; margin: 0 0 4px; }
+  h1{ font-size: 20px; font-weight: 700; margin: 0 0 24px; text-align:center; }
+
+  .timeline{ display:flex; flex-direction:column; }
+  .step{ display:flex; align-items: flex-start; position: relative; }
+  .step:not(:last-child){ padding-bottom: 26px; }
+
+  .time{
+    width: 44px; flex-shrink:0; font-size: 12px; color: var(--gray);
+    padding-top: 3px; text-align:left;
+  }
+
+  .marker{ position: relative; width: 24px; flex-shrink:0; display:flex; justify-content:center; }
+  .dot{
+    width: 22px; height: 22px; border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 12px; z-index: 1; background: var(--card);
+    border: 2px solid var(--gray-light);
+  }
+  .dot.done{ background: var(--green); border-color: var(--green); color: #fff; }
+  .dot.current{ border-color: var(--green); }
+  .dot.current::after{
+    content:''; width: 9px; height:9px; border-radius:50%; background: var(--green);
+    animation: pulse 1.6s infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow: 0 0 0 0 rgba(27,158,90,0.45); }
+    70%{ box-shadow: 0 0 0 8px rgba(27,158,90,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(27,158,90,0); }
+  }
+  .step-line{
+    position:absolute; top: 24px; bottom: -2px; left: 50%;
+    width: 2px; transform: translateX(-50%);
+    background: var(--gray-light);
+  }
+  .step-line.filled{ background: var(--green); }
+  .step:last-child .step-line{ display:none; }
+
+  .label{ padding-left: 12px; padding-top: 2px; }
+  .title{ font-size: 14px; font-weight: 500; color: var(--gray); line-height: 1.4; }
+  .title.active{ color: var(--ink); font-weight: 600; }
+  .sub{ font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+  .loading, .not-found{ text-align:center; color: var(--gray); font-size: 14px; padding: 30px 0; }
+
+  footer{ margin-top: 22px; font-size: 11px; color: var(--gray-light); text-align:center; }
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="loading">Loading…</div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://spcxjfamozmnkgowztij.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNwY3hqZmFtb3ptbmtnb3d6dGlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNjU2OTgsImV4cCI6MjEwMzc0MTY5OH0._hKnAK5gLwwLArYLShxTL3Abpv4ZN2LGqz5PKti-Apc';
+
+const STATUSES = [
+  { key: 'waiting', label: 'Awaiting payment', sub: "We haven't received your payment yet" },
+  { key: 'received', label: 'Payment received', sub: 'Your payment has come through' },
+  { key: 'processing', label: 'Payment processing', sub: "We're processing it now" },
+  { key: 'approved', label: 'Payment approved', sub: 'Your payment has been approved' },
+  { key: 'sent', label: 'Payment sent', sub: "It's on its way to you" }
+];
+
+function escapeHtml(s){
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+function getId(){
+  const params = new URLSearchParams(window.location.search);
+  return params.get('id');
+}
+
+function timeFor(history, key){
+  if(!Array.isArray(history)) return '';
+  const entry = history.find(h => h.status === key);
+  if(!entry) return '';
+  const d = new Date(entry.ts);
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+async function loadStatus(){
+  const id = getId();
+  const card = document.getElementById('card');
+  if(!id){
+    card.innerHTML = '<div class="not-found">No client specified.</div>';
+    return;
+  }
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/client_payments?id=eq.${id}&select=*`, {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+    const rows = await res.json();
+    if(!rows || !rows.length){
+      card.innerHTML = '<div class="not-found">We couldn\'t find that payment status.</div>';
+      return;
+    }
+    render(rows[0]);
+  }catch(e){
+    console.error('Load failed', e);
+    card.innerHTML = '<div class="not-found">Something went wrong loading this page.</div>';
+  }
+}
+
+function render(client){
+  const card = document.getElementById('card');
+  const currentIndex = STATUSES.findIndex(s => s.key === client.status);
+  const history = client.status_history || [];
+
+  const stepsHtml = STATUSES.map((s, i) => {
+    const done = i < currentIndex;
+    const isCurrent = i === currentIndex;
+    const dotClass = done ? 'done' : (isCurrent ? 'current' : '');
+    const dotContent = done ? '✓' : '';
+    const lineClass = i < currentIndex ? 'filled' : '';
+    const time = (done || isCurrent) ? timeFor(history, s.key) : '';
+    return `
+      <div class="step">
+        <div class="time">${time}</div>
+        <div class="marker">
+          <div class="dot ${dotClass}">${dotContent}</div>
+          <div class="step-line ${lineClass}"></div>
+        </div>
+        <div class="label">
+          <div class="title ${done || isCurrent ? 'active' : ''}">${s.label}</div>
+          ${isCurrent ? `<div class="sub">${s.sub}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  card.innerHTML = `
+    <p class="eyebrow">Payment status</p>
+    <h1>${escapeHtml(client.client_name)}</h1>
+    <div class="timeline">${stepsHtml}</div>
+    <footer>Updates automatically</footer>
+  `;
+}
+
+loadStatus();
+setInterval(loadStatus, 15000);
+</script>
+</body>
+</html>
