@@ -164,7 +164,8 @@
 </div>
 
 <script>
-const DATA_URL = 'https://raw.githubusercontent.com/natecruzbtc2-alt/payment-status/main/data/clients.json';
+const API_URL = 'https://api.github.com/repos/natecruzbtc2-alt/payment-status/contents/data/clients.json?ref=main';
+const CDN_URL = 'https://raw.githubusercontent.com/natecruzbtc2-alt/payment-status/main/data/clients.json';
 
 const STATUSES = [
   { key: 'waiting',    label: 'Awaiting payment' },
@@ -195,15 +196,32 @@ function showMessage(text){
   document.getElementById('receipt').innerHTML = `<div class="state-msg">${text}</div>`;
 }
 
+async function fetchClients(){
+  // The GitHub API reflects commits immediately, but is rate-limited for
+  // anonymous requests. The CDN has no meaningful rate limit but can lag
+  // a commit by a few minutes. Try the API first; fall back to the CDN.
+  try{
+    const res = await fetch(API_URL, {
+      headers: { 'Accept': 'application/vnd.github.raw' },
+      cache: 'no-store'
+    });
+    if(res.ok){
+      return await res.json();
+    }
+  }catch(e){
+    console.warn('API fetch failed, falling back to CDN', e);
+  }
+  const res = await fetch(`${CDN_URL}?t=${Date.now()}`, { cache: 'no-store' });
+  if(!res.ok) throw new Error(`CDN fetch failed: ${res.status}`);
+  return await res.json();
+}
+
 async function loadStatus(){
   const id = getId();
   if(!id){ showMessage('No client specified.'); return; }
 
   try{
-    // Cache-bust so viewers always see the latest committed status
-    const res = await fetch(`${DATA_URL}?t=${Date.now()}`, { cache: 'no-store' });
-    if(!res.ok){ showMessage('Nothing here yet. Check back shortly.'); return; }
-    const data = await res.json();
+    const data = await fetchClients();
     const list = Array.isArray(data.clients) ? data.clients : [];
     const client = list.find(c => c.id === id);
     if(!client){ showMessage("We couldn't find that payment status."); return; }
