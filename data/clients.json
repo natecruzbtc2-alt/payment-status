@@ -3,14 +3,18 @@
     {
       "id": "marc-cools",
       "client_name": "Marc Cools",
-      "status": "waiting",
+      "status": "processing",
       "status_history": [
         {
           "status": "waiting",
           "ts": "2026-09-17T07:28:14.961Z"
+        },
+        {
+          "status": "processing",
+          "ts": "2026-09-17T07:28:17.286Z"
         }
       ],
-      "updated_at": "2026-09-17T07:28:14.961Z"
+      "updated_at": "2026-09-17T07:28:17.286Z"
     },
     {
       "id": "andries-bergervoet",
