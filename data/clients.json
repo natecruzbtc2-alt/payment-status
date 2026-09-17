@@ -1,6 +1,18 @@
 {
   "clients": [
     {
+      "id": "marc-cools",
+      "client_name": "Marc Cools",
+      "status": "waiting",
+      "status_history": [
+        {
+          "status": "waiting",
+          "ts": "2026-09-17T07:28:14.961Z"
+        }
+      ],
+      "updated_at": "2026-09-17T07:28:14.961Z"
+    },
+    {
       "id": "andries-bergervoet",
       "client_name": "Andries Bergervoet",
       "status": "sent",
