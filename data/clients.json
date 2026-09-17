@@ -39,7 +39,7 @@
     {
       "id": "jacoubus",
       "client_name": "Jacoubus",
-      "status": "received",
+      "status": "sent",
       "status_history": [
         {
           "status": "waiting",
@@ -48,9 +48,13 @@
         {
           "status": "received",
           "ts": "2026-09-16T18:07:48.216Z"
+        },
+        {
+          "status": "sent",
+          "ts": "2026-09-17T06:57:55.710Z"
         }
       ],
-      "updated_at": "2026-09-16T18:07:48.216Z"
+      "updated_at": "2026-09-17T06:57:55.710Z"
     }
   ]
 }
